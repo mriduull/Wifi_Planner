@@ -1,0 +1,18 @@
+# Python virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Output files
+grid.npy
+
+# CAD files (optional – remove these lines if you WANT to upload DXF)
+# *.dxf
+# *.dwg
+# *.skp
+
+# OS junk
+.DS_Store
+Thumbs.db
