@@ -38,6 +38,14 @@ print(result["best_routers"])
 print(result["best_fitness"])
 ```
 
+## Running the smoke test
+
+You can run the module directly without setting `PYTHONPATH`:
+
+```bash
+python member_A_genetic_Algorithm_core/ga_core.py
+```
+
 ## Output
 
 `run_ga()` returns a dict:
