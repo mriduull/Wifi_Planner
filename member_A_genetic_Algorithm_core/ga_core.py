@@ -10,27 +10,18 @@ Assumptions / Integration:
   where routers is List[(x, y)]
 """
 
+
 from __future__ import annotations
 
 import random
 from typing import List, Tuple, Optional, Dict, Any
 
-# ------------------------------------------------------------
-# Import fitness_function (edit ONLY this line if your file name differs)
-# ------------------------------------------------------------
-try:
-    # Change 'signal_math' to the actual filename that contains fitness_function
-    from member_B_signal_simulation_engine.signal_math import fitness_function
-except ModuleNotFoundError:
-    # Allow running this file directly without setting PYTHONPATH
-    import os
-    import sys
+from member_B_signal_simulation_engine.signal_math import fitness_function
 
-    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    if repo_root not in sys.path:
-        sys.path.insert(0, repo_root)
 
-    from member_B_signal_simulation_engine.signal_math import fitness_function
+
+
+
 
 
 Cell = Tuple[int, int]        # (x, y)

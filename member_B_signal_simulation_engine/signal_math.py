@@ -161,9 +161,12 @@ def coverage_metrics(routers, grid, max_range_m=30.0):
 # FITNESS (for GA)
 # -----------------------------
 def fitness_function(routers, grid, beta=0.0):
-    coverage, _avg = coverage_metrics(routers, grid)
+    coverage, _avg = coverage_metrics(
+        routers,
+        grid,
+        max_range_m=10.0   # ↓ from 12.0
+    )
 
-    # optional overlap penalty later
     overlap_penalty = 0.0
-
     return coverage - beta * overlap_penalty
+
