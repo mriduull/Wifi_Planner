@@ -21,8 +21,21 @@ if REPO_ROOT not in sys.path:
 # ============================================================
 # STEP 1: Load the grid (produced by Person C's pipeline)
 # ============================================================
-def load_grid():
-    """Load grid.npy and convert to string format for GA/signal code."""
+def downsample_grid(grid, factor):
+    """Downsample grid by given factor using max pooling (preserves walls)."""
+    h, w = grid.shape
+    new_h, new_w = h // factor, w // factor
+    result = np.zeros((new_h, new_w), dtype=grid.dtype)
+    
+    for y in range(new_h):
+        for x in range(new_w):
+            block = grid[y*factor:(y+1)*factor, x*factor:(x+1)*factor]
+            result[y, x] = 1 if np.any(block == 1) else 0
+    
+    return result
+
+def load_grid(downsample_factor=1):
+    """Load grid.npy and optionally downsample for faster processing."""
     grid_path = os.path.join(REPO_ROOT, "grid.npy")
     meta_path = os.path.join(REPO_ROOT, "grid_meta.json")
     
@@ -42,17 +55,12 @@ def load_grid():
         with open(meta_path, "r") as f:
             meta = json.load(f)
     
-    # Convert to string format expected by GA/signal code
-    # GA expects: "FREE", "WALL", "DOOR", "WINDOW"
-    height, width = grid_binary.shape
-    grid_str = []
-    for y in range(height):
-        row = []
-        for x in range(width):
-            row.append("WALL" if grid_binary[y, x] == 1 else "FREE")
-        grid_str.append(row)
+    # Downsample if requested
+    if downsample_factor > 1:
+        grid_binary = downsample_grid(grid_binary, downsample_factor)
+        meta['downsample_factor'] = downsample_factor
     
-    return grid_binary, grid_str, meta
+    return grid_binary, meta
 
 
 # ============================================================
@@ -86,7 +94,7 @@ def run_optimization(grid_str, num_routers=3, generations=50, population_size=30
 # ============================================================
 def calculate_coverage(routers, grid_str):
     """Calculate coverage using Member B's signal physics."""
-    from member_B_signal_simulation_engine.signal_physics import coverage_metrics
+    from member_B_signal_simulation_engine.signal_math import coverage_metrics
     
     coverage_pct, avg_signal = coverage_metrics(routers, grid_str)
     
@@ -165,21 +173,22 @@ def main():
     
     # Configuration
     NUM_ROUTERS = 3
-    GENERATIONS = 50
-    POPULATION_SIZE = 30
+    GENERATIONS = 10  # Reduced for faster testing
+    POPULATION_SIZE = 10  # Reduced for faster testing
     OUTPUT_DIR = "outputs"
+    DOWNSAMPLE_FACTOR = 8  # Reduce grid size for faster optimization
     
-    # Step 1: Load grid
+    # Step 1: Load grid (downsampled for optimization)
     print("\n[1/5] Loading grid data (Person C)...")
-    grid_binary, grid_str, meta = load_grid()
-    print(f"   • Grid shape: {grid_binary.shape}")
+    grid_binary, meta = load_grid(downsample_factor=DOWNSAMPLE_FACTOR)
+    print(f"   • Grid shape: {grid_binary.shape} (downsampled {DOWNSAMPLE_FACTOR}x)")
     print(f"   • Wall cells: {int(grid_binary.sum())}")
     print(f"   • Free cells: {int(grid_binary.size - grid_binary.sum())}")
     
     # Step 2: Run GA optimization
     print("\n[2/5] Running optimization (Member A)...")
     ga_result = run_optimization(
-        grid_str,
+        grid_binary,  # GA expects numeric grid (0=free, 1=wall)
         num_routers=NUM_ROUTERS,
         generations=GENERATIONS,
         population_size=POPULATION_SIZE,
@@ -188,15 +197,24 @@ def main():
     
     # Step 3: Calculate final coverage
     print("\n[3/5] Calculating signal coverage (Member B)...")
-    coverage_pct, avg_signal = calculate_coverage(best_routers, grid_str)
+    coverage_pct, avg_signal = calculate_coverage(best_routers, grid_binary)
     
-    # Step 4: Generate visualizations
+    # Step 4: Generate visualizations (use full-res grid for display)
     print("\n[4/5] Generating visualizations (Member D)...")
-    visualize_results(grid_binary, best_routers, OUTPUT_DIR)
+    grid_full = np.load(os.path.join(REPO_ROOT, "grid.npy"))
+    h_full, w_full = grid_full.shape
+    # Scale router positions back to full resolution
+    # GA returns (x, y) but visualization expects (row, col) = (y, x)
+    # Also clamp to grid bounds
+    routers_full = [
+        (min(y * DOWNSAMPLE_FACTOR, h_full - 1), min(x * DOWNSAMPLE_FACTOR, w_full - 1))
+        for (x, y) in best_routers
+    ]
+    visualize_results(grid_full, routers_full, OUTPUT_DIR)
     
-    # Step 5: Save results
+    # Step 5: Save results (with scaled positions)
     print("\n[5/5] Saving results...")
-    save_results(best_routers, coverage_pct, avg_signal, meta, OUTPUT_DIR)
+    save_results(routers_full, coverage_pct, avg_signal, meta, OUTPUT_DIR)
     
     # Summary
     print("\n" + "=" * 60)

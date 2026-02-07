@@ -1,0 +1,21 @@
+{
+  "routers": [
+    {
+      "x": 512,
+      "y": 64
+    },
+    {
+      "x": 352,
+      "y": 456
+    },
+    {
+      "x": 48,
+      "y": 176
+    }
+  ],
+  "coverage_percent": 100.0,
+  "average_signal_dBm": -47.0906072632384,
+  "grid_meta": {
+    "downsample_factor": 8
+  }
+}
