@@ -1,53 +1,43 @@
 {
   "routers": [
     {
-      "x": 512,
-      "y": 64
+      "x": 896,
+      "y": 168
+    },
+    {
+      "x": 680,
+      "y": 624
     },
     {
       "x": 352,
-      "y": 456
-    },
-    {
-      "x": 48,
-      "y": 176
+      "y": 200
     }
   ],
   "coverage_percent": 100.0,
-  "average_signal_dBm": -47.0906072632384,
+  "average_signal_dBm": -47.81660870231226,
   "grid_meta": {
-    "source": "3DFACE",
-    "cell_size": 1.5,
-    "bounds": {
-      "minx": -2281.81591796875,
-      "miny": -2249.53955078125,
-      "maxx": 2188.192138671875,
-      "maxy": 2254.3662109375
-    },
-    "grid_shape": [
-      3004,
-      2982
-    ],
+    "source": "2D_GRID_FALLBACK",
+    "cell_size": null,
     "codes": {
       "FREE": 0,
       "WALL": 1
     },
-    "notes": "Grid derived from 3DFACE edges (2D projection).",
+    "notes": "Loaded existing grid.npy generated from LINE/LWPOLYLINE DXF extraction.",
     "crop": {
       "cropped": true,
       "crop_box": {
-        "y_min": 1313,
-        "y_max": 2061,
-        "x_min": 1723,
-        "x_max": 2217
+        "y_min": 0,
+        "y_max": 905,
+        "x_min": 115,
+        "x_max": 806
       },
       "original_shape": [
-        3004,
-        2982
+        906,
+        1104
       ],
       "cropped_shape": [
-        749,
-        495
+        906,
+        692
       ]
     },
     "cleanup": {
